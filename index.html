@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R-Chronicle: Neural Lockdown</title>
+    <style>
+        :root { --main: #ff0055; --accent: #00ffcc; --bg: #020205; }
+        body { 
+            margin: 0; background: var(--bg); color: #fff; 
+            font-family: 'Orbitron', sans-serif;
+            display: flex; align-items: center; justify-content: center; height: 100vh;
+        }
+        #game-box { 
+            width: 90%; max-width: 450px; padding: 40px; border: 2px solid var(--main);
+            border-radius: 5px; text-align: center; position: relative;
+            background: linear-gradient(145deg, #050510, #0a0a15);
+            box-shadow: 0 0 50px rgba(255, 0, 85, 0.1);
+        }
+        .glitch { font-size: 35px; font-weight: bold; color: var(--accent); text-shadow: 2px 2px var(--main); }
+        input { 
+            width: 100%; border: none; border-bottom: 2px solid var(--accent);
+            background: transparent; color: #fff; font-size: 24px; text-align: center;
+            margin: 30px 0; outline: none; display: none;
+        }
+        button { 
+            background: transparent; border: 1px solid var(--main); color: var(--main);
+            padding: 10px 30px; cursor: pointer; font-size: 18px; transition: 0.4s;
+        }
+        button:hover { background: var(--main); color: #fff; }
+        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--main); opacity: 0; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div id="game-box">
+    <div id="overlay"></div>
+    <h2 style="letter-spacing: 5px; color: #555;">NEURAL LOCKDOWN</h2>
+    <p id="status">INITIATING SENSORY TEST...</p>
+    <div id="display" class="glitch">READY?</div>
+    <input type="text" id="input-field" autocomplete="off">
+    <br>
+    <button id="btn" onclick="handleAction()">EXECUTE</button>
+</div>
+
+<script>
+    let log = [];
+    let step = 0;
+    let mode = "IDLE"; 
+    let target = "";
+
+    const assets = {
+        names: ["ORION", "VEGA", "SIRIUS", "ALTAIR"],
+        codes: ["99-X", "44-B", "12-K", "07-Z"],
+        colors: ["VIOLET", "AMBER", "CRIMSON", "EMERALD"]
+    };
+
+    function speak(text) {
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.rate = 1.2;
+        window.speechSynthesis.speak(msg);
+    }
+
+    function handleAction() {
+        const input = document.getElementById('input-field');
+        if (mode === "IDLE") {
+            startCycle();
+        } else {
+            verify();
+        }
+    }
+
+    function startCycle() {
+        step++;
+        const display = document.getElementById('display');
+        const input = document.getElementById('input-field');
+        const status = document.getElementById('status');
+        
+        // Tasodifiy ma'lumot olish
+        const keys = Object.keys(assets);
+        const type = keys[Math.floor(Math.random() * keys.length)];
+        const val = assets[type][Math.floor(Math.random() * assets[type].length)];
+        
+        log.push({step, type, val});
+        
+        mode = "MEMORIZE";
+        status.innerText = `PHASE ${step}: ENCODING...`;
+        display.innerText = val;
+        input.style.display = "none";
+        
+        // Chalg'itish ovozi
+        if(step > 1) speak(Math.floor(Math.random()*100));
+
+        setTimeout(() => {
+            display.innerText = "???";
+            status.innerText = "DECODING REQUIRED";
+            input.style.display = "block";
+            input.value = "";
+            input.focus();
+            
+            // Paradox so'rovi (25% ehtimollik bilan)
+            if(step >= 3 && Math.random() > 0.7) {
+                const old = log[Math.floor(Math.random() * (log.length-1))];
+                status.innerText = `RECALL ERROR: WHAT WAS LEVEL ${old.step}?`;
+                target = old.val;
+            } else {
+                // Har 4-bosqichda teskari yozishni so'rash
+                if(step % 4 === 0) {
+                    status.innerText = "CRITICAL: TYPE IN REVERSE!";
+                    target = val.split('').reverse().join('');
+                } else {
+                    target = val;
+                }
+            }
+        }, 1500);
+    }
+
+    function verify() {
+        const input = document.getElementById('input-field').value.toUpperCase();
+        if (input === target) {
+            flash("green");
+            startCycle();
+        } else {
+            flash("red");
+            alert(`SYSTEM CRASH!\nLevel Reached: ${step}\nFailed Target: ${target}`);
+            location.reload();
+        }
+    }
+
+    function flash(color) {
+        const ov = document.getElementById('overlay');
+        ov.style.background = color === "green" ? "#00ffcc" : "#ff0055";
+        ov.style.opacity = "0.3";
+        setTimeout(() => ov.style.opacity = "0", 200);
+    }
+</script>
+</body>
+</html>
