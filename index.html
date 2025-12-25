@@ -2,137 +2,169 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>R-Chronicle: Neural Lockdown</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>R-Chronicle: Zen Precision</title>
     <style>
-        :root { --main: #ff0055; --accent: #00ffcc; --bg: #020205; }
-        body { 
-            margin: 0; background: var(--bg); color: #fff; 
-            font-family: 'Orbitron', sans-serif;
-            display: flex; align-items: center; justify-content: center; height: 100vh;
-        }
-        #game-box { 
-            width: 90%; max-width: 450px; padding: 40px; border: 2px solid var(--main);
-            border-radius: 5px; text-align: center; position: relative;
-            background: linear-gradient(145deg, #050510, #0a0a15);
-            box-shadow: 0 0 50px rgba(255, 0, 85, 0.1);
-        }
-        .glitch { font-size: 35px; font-weight: bold; color: var(--accent); text-shadow: 2px 2px var(--main); }
-        input { 
-            width: 100%; border: none; border-bottom: 2px solid var(--accent);
-            background: transparent; color: #fff; font-size: 24px; text-align: center;
-            margin: 30px 0; outline: none; display: none;
-        }
-        button { 
-            background: transparent; border: 1px solid var(--main); color: var(--main);
-            padding: 10px 30px; cursor: pointer; font-size: 18px; transition: 0.4s;
-        }
-        button:hover { background: var(--main); color: #fff; }
-        #overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--main); opacity: 0; pointer-events: none; }
+        :root { --gold: #d4af37; --fire: #ff4500; --bg: #050505; }
+        body { margin: 0; background: var(--bg); overflow: hidden; font-family: 'Times New Roman', serif; color: var(--gold); touch-action: none; }
+        #ui { position: absolute; top: 30px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; z-index: 10; }
+        .stat { text-align: center; text-transform: uppercase; letter-spacing: 2px; font-size: 11px; }
+        .val { font-size: 26px; font-weight: bold; color: #fff; text-shadow: 0 0 15px var(--gold); }
+        #integrity-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 250px; text-align: center; }
+        #bar { width: 100%; height: 3px; background: #222; margin-top: 10px; border-radius: 2px; overflow: hidden; }
+        #fill { width: 100%; height: 100%; background: var(--gold); transition: 0.6s ease-out; }
+        #game-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 100; text-align: center; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
 
-<div id="game-box">
-    <div id="overlay"></div>
-    <h2 style="letter-spacing: 5px; color: #555;">NEURAL LOCKDOWN</h2>
-    <p id="status">INITIATING SENSORY TEST...</p>
-    <div id="display" class="glitch">READY?</div>
-    <input type="text" id="input-field" autocomplete="off">
-    <br>
-    <button id="btn" onclick="handleAction()">EXECUTE</button>
+<div id="ui">
+    <div class="stat">Wisdom Collected<span id="score" class="val">0</span></div>
+    <div class="stat">Focus State<span id="combo" class="val">Stable</span></div>
 </div>
 
+<div id="integrity-container">
+    <span class="stat">Library Stability</span>
+    <div id="bar"><div id="fill"></div></div>
+</div>
+
+<div id="game-over">
+    <h1 style="font-size: 32px; letter-spacing: 5px; color: #ff3e3e;">CHRONICLE PAUSED</h1>
+    <p>The library needs restoration.</p>
+    <button onclick="location.reload()" style="background:none; border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; cursor: pointer; margin-top: 20px; font-family: 'Times New Roman';">RESTORE</button>
+</div>
+
+<canvas id="libCanvas"></canvas>
+
 <script>
-    let log = [];
-    let step = 0;
-    let mode = "IDLE"; 
-    let target = "";
+const canvas = document.getElementById('libCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-    const assets = {
-        names: ["ORION", "VEGA", "SIRIUS", "ALTAIR"],
-        codes: ["99-X", "44-B", "12-K", "07-Z"],
-        colors: ["VIOLET", "AMBER", "CRIMSON", "EMERALD"]
-    };
+let score = 0, integrity = 100, combo = 0, gameActive = true;
+let pages = [];
 
-    function speak(text) {
-        const msg = new SpeechSynthesisUtterance(text);
-        msg.rate = 1.2;
-        window.speechSynthesis.speak(msg);
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playNote(f, v=0.03) {
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.frequency.value = f;
+    g.gain.setValueAtTime(v, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.2);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(); o.stop(audioCtx.currentTime + 1.2);
+}
+
+class Page {
+    constructor() {
+        this.angle = Math.random() * Math.PI * 2;
+        this.z = 0; 
+        this.type = Math.random() > 0.8 ? 'fire' : 'gold';
+        this.rot = Math.random() * Math.PI;
+        // Juda sekin tezlik (0.01)
+        this.v = 0.008 + Math.random() * 0.005; 
     }
+    update() {
+        this.z += this.v;
+        this.rot += 0.005;
+        
+        // Markazdan uzoqlashish mantiqi (Perspektiva)
+        const perspective = this.z * this.z * 500;
+        this.screenX = canvas.width/2 + Math.cos(this.angle) * perspective;
+        this.screenY = canvas.height/2 + Math.sin(this.angle) * perspective;
+        this.size = this.z * 80;
 
-    function handleAction() {
-        const input = document.getElementById('input-field');
-        if (mode === "IDLE") {
-            startCycle();
-        } else {
-            verify();
-        }
-    }
-
-    function startCycle() {
-        step++;
-        const display = document.getElementById('display');
-        const input = document.getElementById('input-field');
-        const status = document.getElementById('status');
-        
-        // Tasodifiy ma'lumot olish
-        const keys = Object.keys(assets);
-        const type = keys[Math.floor(Math.random() * keys.length)];
-        const val = assets[type][Math.floor(Math.random() * assets[type].length)];
-        
-        log.push({step, type, val});
-        
-        mode = "MEMORIZE";
-        status.innerText = `PHASE ${step}: ENCODING...`;
-        display.innerText = val;
-        input.style.display = "none";
-        
-        // Chalg'itish ovozi
-        if(step > 1) speak(Math.floor(Math.random()*100));
-
-        setTimeout(() => {
-            display.innerText = "???";
-            status.innerText = "DECODING REQUIRED";
-            input.style.display = "block";
-            input.value = "";
-            input.focus();
-            
-            // Paradox so'rovi (25% ehtimollik bilan)
-            if(step >= 3 && Math.random() > 0.7) {
-                const old = log[Math.floor(Math.random() * (log.length-1))];
-                status.innerText = `RECALL ERROR: WHAT WAS LEVEL ${old.step}?`;
-                target = old.val;
+        if (this.z > 1.1) {
+            if (this.type === 'fire') {
+                integrity -= 10; // Zarar kamaytirildi
+                playNote(110, 0.08);
             } else {
-                // Har 4-bosqichda teskari yozishni so'rash
-                if(step % 4 === 0) {
-                    status.innerText = "CRITICAL: TYPE IN REVERSE!";
-                    target = val.split('').reverse().join('');
-                } else {
-                    target = val;
-                }
+                score += 100;
+                playNote(440);
             }
-        }, 1500);
+            return false;
+        }
+        return true;
     }
+    draw() {
+        ctx.save();
+        ctx.translate(this.screenX, this.screenY);
+        ctx.rotate(this.rot);
+        
+        // Sahifa soyasi va foni
+        ctx.shadowBlur = this.size / 3;
+        ctx.shadowColor = this.type === 'fire' ? 'rgba(255, 69, 0, 0.6)' : 'rgba(212, 175, 55, 0.4)';
+        ctx.fillStyle = this.type === 'fire' ? '#ff4500' : '#fdfaf0';
+        
+        // To'g'ri to'rtburchak shakli
+        ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size * 1.3);
+        
+        // Sahifa hoshiyasi
+        ctx.strokeStyle = this.type === 'fire' ? '#000' : '#d4af37';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size * 1.3);
+        
+        ctx.restore();
+    }
+}
 
-    function verify() {
-        const input = document.getElementById('input-field').value.toUpperCase();
-        if (input === target) {
-            flash("green");
-            startCycle();
+function draw() {
+    if(!gameActive) return;
+
+    // Fon - chuqur qorong'u kutubxona effekti
+    const bg = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, canvas.width);
+    bg.addColorStop(0, '#0a0908');
+    bg.addColorStop(1, '#000000');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Yangi sahifa yaratish tezligi kamaytirildi
+    if(Math.random() < 0.02) pages.push(new Page());
+
+    for (let i = pages.length - 1; i >= 0; i--) {
+        if (!pages[i].update()) {
+            pages.splice(i, 1);
         } else {
-            flash("red");
-            alert(`SYSTEM CRASH!\nLevel Reached: ${step}\nFailed Target: ${target}`);
-            location.reload();
+            pages[i].draw();
         }
     }
 
-    function flash(color) {
-        const ov = document.getElementById('overlay');
-        ov.style.background = color === "green" ? "#00ffcc" : "#ff0055";
-        ov.style.opacity = "0.3";
-        setTimeout(() => ov.style.opacity = "0", 200);
+    document.getElementById('score').innerText = score;
+    document.getElementById('fill').style.width = integrity + '%';
+    
+    if(integrity <= 0) {
+        gameActive = false;
+        document.getElementById('game-over').style.display = 'flex';
     }
+
+    requestAnimationFrame(draw);
+}
+
+const handleInput = (e) => {
+    const x = e.clientX || (e.touches && e.touches[0].clientX);
+    const y = e.clientY || (e.touches && e.touches[0].clientY);
+
+    for (let i = pages.length - 1; i >= 0; i--) {
+        const p = pages[i];
+        const d = Math.sqrt((x - p.screenX)**2 + (y - p.screenY)**2);
+        
+        // Juda aniq va katta hitbox (1.8x)
+        if (d < p.size * 1.8 && p.type === 'fire') {
+            pages.splice(i, 1);
+            score += 50;
+            playNote(659, 0.02); // Mayin ovoz
+            break; 
+        }
+    }
+};
+
+canvas.addEventListener('mousedown', handleInput);
+canvas.addEventListener('touchstart', handleInput);
+
+draw();
 </script>
 </body>
 </html>
