@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiyaBoost - Kognitiv Mashq O'yini</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Noto+Color+Emoji&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00f5ff;
+            --secondary: #ff00ff;
+            --accent: #ffff00;
+            --dark: #0a0e27;
+            --darker: #050814;
+            --glow: rgba(0, 245, 255, 0.3);
+        }
+
+        body {
+            font-family: 'Space Mono', monospace, 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+            background: var(--darker);
+            color: var(--primary);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            animation: bgPulse 8s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes bgPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2rem, 5vw, 4rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px var(--glow);
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+        }
+
+        .subtitle {
+            color: rgba(0, 245, 255, 0.7);
+            font-size: 1rem;
+            letter-spacing: 2px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            animation: fadeIn 1s ease-out 0.3s both;
+        }
+
+        .stat-card {
+            background: rgba(10, 14, 39, 0.8);
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 20px var(--glow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(0, 245, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 30px var(--glow);
+            border-color: var(--accent);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .game-modes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .mode-card {
+            background: linear-gradient(135deg, rgba(10, 14, 39, 0.9), rgba(5, 8, 20, 0.9));
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .mode-card:hover::before {
+            opacity: 1;
+        }
+
+        .mode-card:hover {
+            transform: scale(1.05) rotate(1deg);
+            box-shadow: 0 10px 40px rgba(0, 245, 255, 0.4);
+        }
+
+        .mode-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px currentColor);
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+        }
+
+        .mode-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .mode-desc {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        #gameArea {
+            background: rgba(10, 14, 39, 0.95);
+            border: 3px solid var(--primary);
+            border-radius: 25px;
+            padding: 40px;
+            min-height: 400px;
+            display: none;
+            animation: slideIn 0.5s ease-out;
+            box-shadow: 0 0 40px var(--glow);
+            position: relative;
+        }
+        
+        #gameArea.no-controls .game-controls {
+            display: none;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            border: none;
+            padding: 15px 40px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 20px rgba(0, 245, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 245, 255, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* Memory Game Styles */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            max-width: 600px;
+            margin: 30px auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(255, 0, 255, 0.2));
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-family: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', sans-serif;
+            transition: all 0.3s ease;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .memory-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--glow);
+        }
+
+        .memory-card.flipped {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            transform: rotateY(180deg);
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(135deg, var(--accent), #00ff00);
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        /* Pattern Recognition */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            max-width: 400px;
+            margin: 30px auto;
+        }
+
+        .pattern-cell {
+            aspect-ratio: 1;
+            background: rgba(0, 245, 255, 0.1);
+            border: 2px solid var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .pattern-cell.active {
+            background: var(--accent);
+            box-shadow: 0 0 20px var(--accent);
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+
+        /* Quick Math */
+        .math-question {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            text-align: center;
+            margin: 40px 0;
+            color: var(--accent);
+            text-shadow: 0 0 20px var(--accent);
+        }
+
+        .answer-input {
+            font-family: 'Orbitron', sans-serif;
+            background: rgba(10, 14, 39, 0.8);
+            border: 3px solid var(--primary);
+            color: var(--primary);
+            padding: 20px;
+            font-size: 2rem;
+            text-align: center;
+            border-radius: 15px;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            display: block;
+            box-shadow: 0 0 20px var(--glow);
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 30px var(--accent);
+        }
+
+        /* Color Match */
+        .color-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .color-option {
+            padding: 40px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+            border-color: var(--accent);
+        }
+
+        .timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--accent);
+        }
+
+        .game-controls {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(0, 245, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 20px 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.correct {
+            color: #00ff00;
+            text-shadow: 0 0 20px #00ff00;
+        }
+
+        .feedback.incorrect {
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+        }
+
+        @media (max-width: 768px) {
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .pattern-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .math-question {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧠 MİYABOOST</h1>
+            <p class="subtitle">Kognitiv Kuchingizni Oshiring</p>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Umumiy Ball</div>
+                <div class="stat-value" id="totalScore">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ketma-ket To'g'ri</div>
+                <div class="stat-value" id="streak">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Muvaffaqiyat %</div>
+                <div class="stat-value" id="accuracy">100</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Darajangiz</div>
+                <div class="stat-value" id="level">1</div>
+            </div>
+        </div>
+
+        <div class="game-modes" id="gameModes">
+            <div class="mode-card" onclick="startGame('memory')">
+                <div class="mode-icon">🃏</div>
+                <div class="mode-title">Xotira Sinovi</div>
+                <div class="mode-desc">Kartalarni eslang va juftlarini toping. Xotira va diqqatingizni rivojlantiring.</div>
+            </div>
+
+            <div class="mode-card" onclick="startGame('pattern')">
+                <div class="mode-icon">🎨</div>
+                <div class="mode-title">Naqsh Aniqlash</div>
+                <div class="mode-desc">Ko'rsatilgan naqshni eslab qoling va takrorlang. Vizual xotira mashqi.</div>
+            </div>
+
+            <div class="mode-card" onclick="startGame('math')">
+                <div class="mode-icon">➗</div>
+                <div class="mode-title">Tez Hisob</div>
+                <div class="mode-desc">Matematik masalalarni tez hal qiling. Mantiqiy fikrlash va tezkorlik.</div>
+            </div>
+
+            <div class="mode-card" onclick="startGame('color')">
+                <div class="mode-icon">🌈</div>
+                <div class="mode-title">Rang Uyg'unligi</div>
+                <div class="mode-desc">So'z va rangni mos keltiring. Diqqat va konsentratsiya mashqi.</div>
+            </div>
+        </div>
+
+        <div id="gameArea">
+            <div class="timer" id="timer"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="feedback" id="feedback"></div>
+            <div id="gameContent"></div>
+            <div class="game-controls">
+                <button class="btn" onclick="resetGame()">🏠 Bosh sahifa</button>
+                <button class="btn" onclick="restartGame()">🔄 Qayta boshlash</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            totalScore: 0,
+            streak: 0,
+            accuracy: 100,
+            level: 1,
+            correct: 0,
+            total: 0,
+            currentGame: null,
+            timer: null,
+            timeLeft: 0
+        };
+
+        const emojis = ['⭐', '🎨', '🎭', '🎪', '🎯', '🎲', '🎸', '🎹', '🎺', '🎻', '🎼', '🎵', '🎶', '🏀', '⚽', '🎮'];
+        const colors = ['🔴', '🟢', '🔵', '🟡', '🟣', '🟠'];
+
+        function startGame(gameType) {
+            gameState.currentGame = gameType;
+            document.getElementById('gameModes').style.display = 'none';
+            const gameArea = document.getElementById('gameArea');
+            gameArea.style.display = 'block';
+            gameArea.classList.remove('no-controls');
+            
+            switch(gameType) {
+                case 'memory':
+                    initMemoryGame();
+                    break;
+                case 'pattern':
+                    initPatternGame();
+                    break;
+                case 'math':
+                    initMathGame();
+                    break;
+                case 'color':
+                    initColorGame();
+                    break;
+            }
+        }
+
+        function initMemoryGame() {
+            const cards = [...emojis.slice(0, 8), ...emojis.slice(0, 8)].sort(() => Math.random() - 0.5);
+            let flipped = [];
+            let matched = 0;
+            
+            const grid = document.createElement('div');
+            grid.className = 'memory-grid';
+            
+            cards.forEach((emoji, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                card.dataset.emoji = emoji;
+                card.dataset.index = index;
+                card.innerHTML = '❓';
+                
+                card.onclick = function() {
+                    if (flipped.length < 2 && !this.classList.contains('flipped') && !this.classList.contains('matched')) {
+                        this.classList.add('flipped');
+                        this.innerHTML = emoji;
+                        flipped.push(this);
+                        
+                        if (flipped.length === 2) {
+                            gameState.total++;
+                            if (flipped[0].dataset.emoji === flipped[1].dataset.emoji) {
+                                setTimeout(() => {
+                                    flipped.forEach(c => c.classList.add('matched'));
+                                    matched += 2;
+                                    showFeedback(true);
+                                    updateScore(50);
+                                    flipped = [];
+                                    
+                                    if (matched === cards.length) {
+                                        setTimeout(() => {
+                                            alert('🎉 Tabriklaymiz! Barcha juftlarni topdingiz!');
+                                            updateLevel();
+                                            resetGame();
+                                        }, 500);
+                                    }
+                                }, 500);
+                            } else {
+                                setTimeout(() => {
+                                    flipped.forEach(c => {
+                                        c.classList.remove('flipped');
+                                        c.innerHTML = '❓';
+                                    });
+                                    showFeedback(false);
+                                    flipped = [];
+                                }, 1000);
+                            }
+                        }
+                    }
+                };
+                
+                grid.appendChild(card);
+            });
+            
+            document.getElementById('gameContent').innerHTML = '';
+            document.getElementById('gameContent').appendChild(grid);
+            startTimer(120);
+        }
+
+        function initPatternGame() {
+            let pattern = [];
+            let userPattern = [];
+            let level = Math.min(3 + Math.floor(gameState.level / 2), 10);
+            let patternScore = 0;
+            
+            const grid = document.createElement('div');
+            grid.className = 'pattern-grid';
+            
+            for (let i = 0; i < 25; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'pattern-cell';
+                cell.dataset.index = i;
+                grid.appendChild(cell);
+            }
+            
+            document.getElementById('gameContent').innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 1.2rem; color: var(--primary);">
+                        ✓ To'g'ri naqshlar: ${patternScore}
+                    </div>
+                </div>
+                <h2 style="text-align:center; margin-bottom:20px;">Naqshni kuzating...</h2>
+            `;
+            document.getElementById('gameContent').appendChild(grid);
+            
+            function nextRound() {
+                pattern = [];
+                userPattern = [];
+                level = Math.min(3 + Math.floor(patternScore / 2), 10);
+                
+                // Clear grid
+                Array.from(grid.children).forEach(cell => {
+                    cell.classList.remove('active');
+                    cell.onclick = null;
+                });
+                
+                // Generate pattern
+                for (let i = 0; i < level; i++) {
+                    let newIndex;
+                    do {
+                        newIndex = Math.floor(Math.random() * 25);
+                    } while (pattern.includes(newIndex));
+                    pattern.push(newIndex);
+                }
+                
+                document.querySelector('h2').textContent = 'Naqshni kuzating...';
+                
+                // Show pattern
+                let i = 0;
+                const showInterval = setInterval(() => {
+                    if (i > 0) {
+                        grid.children[pattern[i-1]].classList.remove('active');
+                    }
+                    if (i < pattern.length) {
+                        grid.children[pattern[i]].classList.add('active');
+                        i++;
+                    } else {
+                        clearInterval(showInterval);
+                        setTimeout(() => {
+                            grid.children[pattern[pattern.length-1]].classList.remove('active');
+                            document.querySelector('h2').textContent = 'Endi naqshni takrorlang!';
+                            
+                            // Enable clicking
+                            Array.from(grid.children).forEach(cell => {
+                                cell.onclick = function() {
+                                    const index = parseInt(this.dataset.index);
+                                    userPattern.push(index);
+                                    this.classList.add('active');
+                                    
+                                    setTimeout(() => this.classList.remove('active'), 300);
+                                    
+                                    // Check each click
+                                    if (userPattern[userPattern.length - 1] !== pattern[userPattern.length - 1]) {
+                                        // Wrong pattern
+                                        endPatternGame();
+                                        return;
+                                    }
+                                    
+                                    if (userPattern.length === pattern.length) {
+                                        gameState.total++;
+                                        showFeedback(true);
+                                        updateScore(100);
+                                        patternScore++;
+                                        
+                                        // Update score display
+                                        document.querySelector('div[style*="To\'g\'ri naqshlar"]').innerHTML = `✓ To'g'ri naqshlar: ${patternScore}`;
+                                        
+                                        setTimeout(() => {
+                                            nextRound();
+                                        }, 1000);
+                                    }
+                                };
+                            });
+                        }, 500);
+                    }
+                }, 800);
+            }
+            
+            function endPatternGame() {
+                document.getElementById('gameArea').classList.add('no-controls');
+                
+                document.getElementById('gameContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">😔</div>
+                        <h2 style="font-family: 'Orbitron'; font-size: 2.5rem; color: var(--primary); margin-bottom: 20px;">
+                            YUTQAZDINGIZ!
+                        </h2>
+                        <div style="font-size: 1.8rem; color: var(--accent); margin-bottom: 30px;">
+                            ✓ Siz ${patternScore} ta naqshni to'g'ri topdingiz!
+                        </div>
+                        <div style="font-size: 1.2rem; color: var(--secondary); margin-bottom: 40px;">
+                            ${patternScore >= 10 ? '🎉 Ajoyib xotira!' : patternScore >= 5 ? '👍 Yaxshi natija!' : '💪 Mashq qiling, yaxshiroq bo\'lasiz!'}
+                        </div>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn" onclick="startGame('pattern')">🔄 Qayta boshlash</button>
+                            <button class="btn" onclick="resetGame()">🏠 Bosh sahifa</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            nextRound();
+        }
+
+        function initMathGame() {
+            let mathGameState = {
+                correctAnswers: 0,
+                timePerQuestion: 10,
+                questionTimer: null,
+                timeLeft: 10
+            };
+            
+            function newQuestion() {
+                clearInterval(mathGameState.questionTimer);
+                mathGameState.timeLeft = mathGameState.timePerQuestion;
+                
+                const level = gameState.level;
+                const operations = ['+', '-', '×', '÷'];
+                const op = operations[Math.floor(Math.random() * Math.min(2 + Math.floor(level/3), 4))];
+                
+                let a, b, correctAnswer;
+                
+                switch(op) {
+                    case '+':
+                        a = Math.floor(Math.random() * (10 * level)) + 1;
+                        b = Math.floor(Math.random() * (10 * level)) + 1;
+                        correctAnswer = a + b;
+                        break;
+                    case '-':
+                        a = Math.floor(Math.random() * (10 * level)) + 10;
+                        b = Math.floor(Math.random() * a) + 1;
+                        correctAnswer = a - b;
+                        break;
+                    case '×':
+                        a = Math.floor(Math.random() * (5 + level)) + 1;
+                        b = Math.floor(Math.random() * (5 + level)) + 1;
+                        correctAnswer = a * b;
+                        break;
+                    case '÷':
+                        b = Math.floor(Math.random() * 9) + 2;
+                        correctAnswer = Math.floor(Math.random() * (5 + level)) + 1;
+                        a = b * correctAnswer;
+                        break;
+                }
+                
+                // Generate wrong answers
+                let answers = [correctAnswer];
+                while (answers.length < 4) {
+                    let wrongAnswer = correctAnswer + Math.floor(Math.random() * 20) - 10;
+                    if (wrongAnswer !== correctAnswer && wrongAnswer > 0 && !answers.includes(wrongAnswer)) {
+                        answers.push(wrongAnswer);
+                    }
+                }
+                
+                // Shuffle answers
+                answers.sort(() => Math.random() - 0.5);
+                
+                document.getElementById('gameContent').innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 1.5rem; color: var(--accent); margin-bottom: 10px;">
+                            ⏱️ Vaqt: <span id="questionTimer">${mathGameState.timeLeft}</span> soniya
+                        </div>
+                        <div style="font-size: 1.2rem; color: var(--primary);">
+                            ✓ To'g'ri javoblar: ${mathGameState.correctAnswers}
+                        </div>
+                    </div>
+                    <div class="math-question">${a} ${op} ${b} = ?</div>
+                    <div class="color-options">
+                        ${answers.map(ans => `
+                            <div class="color-option" style="background: linear-gradient(135deg, rgba(0, 245, 255, 0.3), rgba(255, 0, 255, 0.3)); padding: 30px; font-size: 2rem; font-family: 'Orbitron';" onclick="checkMathAnswer(${ans}, ${correctAnswer})">
+                                ${ans}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Start question timer
+                mathGameState.questionTimer = setInterval(() => {
+                    mathGameState.timeLeft--;
+                    document.getElementById('questionTimer').textContent = mathGameState.timeLeft;
+                    
+                    if (mathGameState.timeLeft <= 0) {
+                        clearInterval(mathGameState.questionTimer);
+                        endMathGame();
+                    }
+                }, 1000);
+            }
+            
+            window.checkMathAnswer = function(userAnswer, correctAnswer) {
+                clearInterval(mathGameState.questionTimer);
+                gameState.total++;
+                
+                if (userAnswer === correctAnswer) {
+                    mathGameState.correctAnswers++;
+                    showFeedback(true);
+                    updateScore(100);
+                    
+                    // Speed up - reduce time per question
+                    if (mathGameState.correctAnswers % 3 === 0 && mathGameState.timePerQuestion > 3) {
+                        mathGameState.timePerQuestion -= 0.5;
+                    }
+                    
+                    setTimeout(newQuestion, 800);
+                } else {
+                    showFeedback(false);
+                    endMathGame();
+                }
+            };
+            
+            function endMathGame() {
+                clearInterval(mathGameState.questionTimer);
+                document.getElementById('gameArea').classList.add('no-controls');
+                
+                document.getElementById('gameContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">😔</div>
+                        <h2 style="font-family: 'Orbitron'; font-size: 2.5rem; color: var(--primary); margin-bottom: 20px;">
+                            YUTQAZDINGIZ!
+                        </h2>
+                        <div style="font-size: 1.8rem; color: var(--accent); margin-bottom: 30px;">
+                            ✓ Siz ${mathGameState.correctAnswers} ta to'g'ri javob topdingiz!
+                        </div>
+                        <div style="font-size: 1.2rem; color: var(--secondary); margin-bottom: 40px;">
+                            ${mathGameState.correctAnswers >= 10 ? '🎉 Ajoyib natija!' : mathGameState.correctAnswers >= 5 ? '👍 Yaxshi harakat!' : '💪 Keyingi safar yaxshiroq bo\'ladi!'}
+                        </div>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn" onclick="startGame('math')">🔄 Qayta boshlash</button>
+                            <button class="btn" onclick="resetGame()">🏠 Bosh sahifa</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            newQuestion();
+        }
+
+        function initColorGame() {
+            const colorNames = ['QIZIL', 'YASHIL', 'KOK', 'SARIQ', 'BINAFSHA', 'TO\'Q SARIQ'];
+            const colorValues = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#ff8800'];
+            
+            let colorGameState = {
+                correctAnswers: 0,
+                questionTimer: null,
+                timeLeft: 5
+            };
+            
+            function newRound() {
+                clearInterval(colorGameState.questionTimer);
+                colorGameState.timeLeft = 5;
+                
+                const wordIndex = Math.floor(Math.random() * colorNames.length);
+                const colorIndex = Math.floor(Math.random() * colorValues.length);
+                const correctAnswer = colorIndex;
+                
+                document.getElementById('gameContent').innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 1.5rem; color: var(--accent); margin-bottom: 10px;">
+                            ⏱️ Vaqt: <span id="colorTimer">${colorGameState.timeLeft}</span> soniya
+                        </div>
+                        <div style="font-size: 1.2rem; color: var(--primary);">
+                            ✓ To'g'ri javoblar: ${colorGameState.correctAnswers}
+                        </div>
+                    </div>
+                    <h2 style="text-align:center; font-family: 'Orbitron'; font-size: 3rem; color: ${colorValues[colorIndex]}; margin: 40px 0; text-shadow: 0 0 30px ${colorValues[colorIndex]};">
+                        ${colorNames[wordIndex]}
+                    </h2>
+                    <p style="text-align:center; font-size: 1.2rem; margin-bottom: 30px;">Qaysi RANGDA yozilgan?</p>
+                    <div class="color-options" id="colorOptions"></div>
+                `;
+                
+                const optionsDiv = document.getElementById('colorOptions');
+                colorNames.forEach((name, index) => {
+                    const option = document.createElement('div');
+                    option.className = 'color-option';
+                    option.style.background = colorValues[index];
+                    option.style.color = '#000';
+                    option.textContent = name;
+                    
+                    option.onclick = () => {
+                        clearInterval(colorGameState.questionTimer);
+                        gameState.total++;
+                        
+                        if (index === correctAnswer) {
+                            colorGameState.correctAnswers++;
+                            showFeedback(true);
+                            updateScore(60);
+                            setTimeout(newRound, 800);
+                        } else {
+                            showFeedback(false);
+                            endColorGame();
+                        }
+                    };
+                    
+                    optionsDiv.appendChild(option);
+                });
+                
+                // Start question timer
+                colorGameState.questionTimer = setInterval(() => {
+                    colorGameState.timeLeft--;
+                    document.getElementById('colorTimer').textContent = colorGameState.timeLeft;
+                    
+                    if (colorGameState.timeLeft <= 0) {
+                        clearInterval(colorGameState.questionTimer);
+                        endColorGame();
+                    }
+                }, 1000);
+            }
+            
+            function endColorGame() {
+                clearInterval(colorGameState.questionTimer);
+                document.getElementById('gameArea').classList.add('no-controls');
+                
+                document.getElementById('gameContent').innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 4rem; margin-bottom: 20px;">😔</div>
+                        <h2 style="font-family: 'Orbitron'; font-size: 2.5rem; color: var(--primary); margin-bottom: 20px;">
+                            YUTQAZDINGIZ!
+                        </h2>
+                        <div style="font-size: 1.8rem; color: var(--accent); margin-bottom: 30px;">
+                            ✓ Siz ${colorGameState.correctAnswers} ta to'g'ri javob topdingiz!
+                        </div>
+                        <div style="font-size: 1.2rem; color: var(--secondary); margin-bottom: 40px;">
+                            ${colorGameState.correctAnswers >= 15 ? '🎉 Ajoyib diqqat!' : colorGameState.correctAnswers >= 8 ? '👍 Yaxshi natija!' : '💪 Mashq qiling, yaxshiroq bo\'lasiz!'}
+                        </div>
+                        <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn" onclick="startGame('color')">🔄 Qayta boshlash</button>
+                            <button class="btn" onclick="resetGame()">🏠 Bosh sahifa</button>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            newRound();
+        }
+
+        function startTimer(seconds) {
+            gameState.timeLeft = seconds;
+            updateTimerDisplay();
+            
+            clearInterval(gameState.timer);
+            gameState.timer = setInterval(() => {
+                gameState.timeLeft--;
+                updateTimerDisplay();
+                updateProgress();
+                
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timer);
+                    alert('⏰ Vaqt tugadi!');
+                    resetGame();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(gameState.timeLeft / 60);
+            const seconds = gameState.timeLeft % 60;
+            document.getElementById('timer').textContent = `⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            const maxTime = gameState.currentGame === 'memory' ? 120 : gameState.currentGame === 'math' ? 180 : 120;
+            const progress = (gameState.timeLeft / maxTime) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function showFeedback(correct) {
+            const feedback = document.getElementById('feedback');
+            feedback.className = 'feedback show ' + (correct ? 'correct' : 'incorrect');
+            feedback.textContent = correct ? '✓ TO\'G\'RI!' : '✗ NOTO\'G\'RI!';
+            
+            setTimeout(() => {
+                feedback.classList.remove('show');
+            }, 1000);
+        }
+
+        function updateScore(points) {
+            gameState.correct++;
+            gameState.totalScore += points;
+            gameState.streak++;
+            
+            // Update accuracy
+            gameState.accuracy = Math.round((gameState.correct / gameState.total) * 100);
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('totalScore').textContent = gameState.totalScore;
+            document.getElementById('streak').textContent = gameState.streak;
+            document.getElementById('accuracy').textContent = gameState.accuracy;
+            document.getElementById('level').textContent = gameState.level;
+        }
+
+        function updateLevel() {
+            if (gameState.totalScore >= gameState.level * 500) {
+                gameState.level++;
+                alert('🎊 Darajangiz oshdi! Siz ' + gameState.level + '-darajasiz!');
+            }
+        }
+
+        function resetGame() {
+            clearInterval(gameState.timer);
+            document.getElementById('gameModes').style.display = 'grid';
+            document.getElementById('gameArea').style.display = 'none';
+            gameState.currentGame = null;
+            
+            if (gameState.total > 0 && gameState.correct === 0) {
+                gameState.streak = 0;
+            }
+        }
+
+        function restartGame() {
+            if (gameState.currentGame) {
+                startGame(gameState.currentGame);
+            }
+        }
+
+        // Initialize display
+        updateDisplay();
+    </script>
+</body>
+</html>
