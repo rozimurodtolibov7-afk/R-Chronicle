@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>➕ Matematik Sinov</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #4facfe;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #4facfe;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .difficulty-selector {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .difficulty-btn {
+            background: white;
+            color: #4facfe;
+            border: 2px solid #4facfe;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease;
+        }
+
+        .question-number {
+            text-align: center;
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .math-question {
+            text-align: center;
+            font-size: 3em;
+            color: #4facfe;
+            margin: 40px 0;
+            font-weight: bold;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: #ffeb3b;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: width 0.1s linear;
+        }
+
+        .math-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .math-option {
+            padding: 30px;
+            font-size: 1.8em;
+            background: white;
+            border: 3px solid #4facfe;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .math-option:hover:not(.correct):not(.wrong) {
+            background: #4facfe;
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .math-option.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+            animation: correctPulse 0.5s ease;
+        }
+
+        .math-option.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            text-align: center;
+            font-size: 1.5em;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            font-weight: bold;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .feedback.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .feedback.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .game-over {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .game-over.show {
+            display: block;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .game-over h2 {
+            color: #4facfe;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+
+        .game-over p {
+            font-size: 1.3em;
+            color: #666;
+            margin: 15px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin: 10px;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .grade {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+
+        .streak {
+            display: inline-block;
+            background: #ffd700;
+            color: #000;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Matematik Sinov</h1>
+        <p class="subtitle">Tez hisoblang va miyangizni rivojlantiring!</p>
+
+        <div class="difficulty-selector">
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">Oson (+, -)</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">O'rta (+, -, ×)</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">Qiyin (Barchasi)</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="currentScore">0</div>
+                <div class="stat-label">Ball</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="correctCount">0</div>
+                <div class="stat-label">To'g'ri</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="bestScore">0</div>
+                <div class="stat-label">Rekord</div>
+            </div>
+        </div>
+
+        <div id="gameArea">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+
+            <div class="question-number">
+                Savol <span id="currentQuestion">1</span> / <span id="totalQuestions">10</span>
+                <span class="streak" id="streak" style="display: none;">🔥 Ketma-ketlik: <span id="streakCount">0</span></span>
+            </div>
+
+            <div class="timer-bar" id="timerBar"></div>
+
+            <div class="math-question" id="mathProblem">Boshlash uchun tugmani bosing</div>
+
+            <div class="math-options" id="mathOptions"></div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="startGame()">🎮 Boshlash</button>
+            </div>
+        </div>
+
+        <div class="game-over" id="gameOver">
+            <h2>O'yin Tugadi!</h2>
+            <div class="grade" id="grade"></div>
+            <p>Sizning balingiz: <strong id="finalScore">0</strong></p>
+            <p>To'g'ri javoblar: <strong id="finalCorrect">0</strong>/10</p>
+            <p>Aniqlik: <strong id="accuracy">0</strong>%</p>
+            <p id="newRecord" style="color: #ffd700; display: none;">🏆 YANGI REKORD!</p>
+            <button class="btn" onclick="startGame()">Qayta O'ynash</button>
+        </div>
+    </div>
+
+    <script>
+        // Audio Context for sound effects
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let isMusicPlaying = false;
+
+        // Sound effects
+        function playCorrectSound() {
+            const notes = [523, 659, 784];
+            notes.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'sine';
+                oscillator.frequency.value = freq;
+                
+                const startTime = audioContext.currentTime + (index * 0.08);
+                gainNode.gain.setValueAtTime(0.2, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 0.2);
+            });
+        }
+
+        function playWrongSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.value = 150;
+            
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        function playClickSound() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 600;
+            oscillator.type = 'square';
+            
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.05);
+        }
+
+        function playVictorySound() {
+            const melody = [523, 587, 659, 698, 784, 880, 988, 1047];
+            melody.forEach((freq, index) => {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.type = 'triangle';
+                oscillator.frequency.value = freq;
+                
+                const startTime = audioContext.currentTime + (index * 0.1);
+                gainNode.gain.setValueAtTime(0.2, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 0.2);
+            });
+        }
+
+        let difficulty = 'easy';
+        let currentQuestion = 1;
+        let totalQuestions = 10;
+        let score = 0;
+        let correctAnswers = 0;
+        let currentCorrectAnswer = null;
+        let questionTimer = null;
+        let timeLeft = 100;
+        let streak = 0;
+        let bestScore = localStorage.getItem('mathBestScore') || 0;
+
+        document.getElementById('bestScore').textContent = bestScore;
+
+        function setDifficulty(level) {
+            difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function startGame() {
+            currentQuestion = 1;
+            score = 0;
+            correctAnswers = 0;
+            streak = 0;
+
+            document.getElementById('currentScore').textContent = score;
+            document.getElementById('correctCount').textContent = correctAnswers;
+            document.getElementById('gameOver').classList.remove('show');
+            document.getElementById('gameArea').style.display = 'block';
+            document.getElementById('streak').style.display = 'none';
+
+            nextQuestion();
+        }
+
+        function nextQuestion() {
+            if (currentQuestion > totalQuestions) {
+                endGame();
+                return;
+            }
+
+            document.getElementById('currentQuestion').textContent = currentQuestion;
+            document.getElementById('feedback').classList.remove('show');
+            
+            // Update progress
+            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+
+            // Generate question
+            const question = generateQuestion();
+            document.getElementById('mathProblem').textContent = question.problem;
+            currentCorrectAnswer = question.answer;
+
+            // Generate options
+            const options = [question.answer];
+            while (options.length < 4) {
+                const offset = Math.floor(Math.random() * 20) - 10;
+                const wrongAnswer = question.answer + offset;
+                if (!options.includes(wrongAnswer) && wrongAnswer !== question.answer) {
+                    options.push(wrongAnswer);
+                }
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            // Display options
+            const optionsDiv = document.getElementById('mathOptions');
+            optionsDiv.innerHTML = '';
+            options.forEach(option => {
+                const btn = document.createElement('div');
+                btn.className = 'math-option';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(option, btn);
+                optionsDiv.appendChild(btn);
+            });
+
+            // Start timer
+            timeLeft = 100;
+            if (questionTimer) clearInterval(questionTimer);
+            questionTimer = setInterval(() => {
+                timeLeft -= 1;
+                document.getElementById('timerBar').style.width = timeLeft + '%';
+                if (timeLeft <= 0) {
+                    clearInterval(questionTimer);
+                    autoNextQuestion(false);
+                }
+            }, 150);
+        }
+
+        function generateQuestion() {
+            let num1, num2, operation, answer, problem;
+
+            switch(difficulty) {
+                case 'easy':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    operation = Math.random() > 0.5 ? '+' : '-';
+                    if (operation === '-' && num1 < num2) {
+                        [num1, num2] = [num2, num1];
+                    }
+                    answer = operation === '+' ? num1 + num2 : num1 - num2;
+                    problem = `${num1} ${operation} ${num2} = ?`;
+                    break;
+
+                case 'medium':
+                    num1 = Math.floor(Math.random() * 15) + 1;
+                    num2 = Math.floor(Math.random() * 15) + 1;
+                    const ops = ['+', '-', '×'];
+                    operation = ops[Math.floor(Math.random() * ops.length)];
+                    
+                    if (operation === '+') {
+                        answer = num1 + num2;
+                    } else if (operation === '-') {
+                        if (num1 < num2) [num1, num2] = [num2, num1];
+                        answer = num1 - num2;
+                    } else {
+                        answer = num1 * num2;
+                    }
+                    problem = `${num1} ${operation} ${num2} = ?`;
+                    break;
+
+                case 'hard':
+                    const hardOps = ['+', '-', '×', '÷'];
+                    operation = hardOps[Math.floor(Math.random() * hardOps.length)];
+                    
+                    if (operation === '÷') {
+                        num2 = Math.floor(Math.random() * 10) + 1;
+                        answer = Math.floor(Math.random() * 12) + 1;
+                        num1 = num2 * answer;
+                    } else {
+                        num1 = Math.floor(Math.random() * 20) + 1;
+                        num2 = Math.floor(Math.random() * 20) + 1;
+                        
+                        if (operation === '+') {
+                            answer = num1 + num2;
+                        } else if (operation === '-') {
+                            if (num1 < num2) [num1, num2] = [num2, num1];
+                            answer = num1 - num2;
+                        } else {
+                            answer = num1 * num2;
+                        }
+                    }
+                    problem = `${num1} ${operation} ${num2} = ?`;
+                    break;
+            }
+
+            return { problem, answer };
+        }
+
+        function checkAnswer(selected, btn) {
+            clearInterval(questionTimer);
+            
+            const allOptions = document.querySelectorAll('.math-option');
+            allOptions.forEach(opt => opt.style.pointerEvents = 'none');
+
+            const feedback = document.getElementById('feedback');
+
+            if (selected === currentCorrectAnswer) {
+                playCorrectSound();
+                btn.classList.add('correct');
+                feedback.className = 'feedback success show';
+                feedback.textContent = '✓ Ajoyib! To\'g\'ri!';
+                
+                correctAnswers++;
+                streak++;
+                const timeBonus = Math.floor(timeLeft / 10);
+                const streakBonus = streak >= 3 ? streak * 2 : 0;
+                score += 10 + timeBonus + streakBonus;
+
+                document.getElementById('correctCount').textContent = correctAnswers;
+                document.getElementById('currentScore').textContent = score;
+
+                if (streak >= 3) {
+                    document.getElementById('streak').style.display = 'inline-block';
+                    document.getElementById('streakCount').textContent = streak;
+                }
+            } else {
+                playWrongSound();
+                btn.classList.add('wrong');
+                streak = 0;
+                document.getElementById('streak').style.display = 'none';
+                
+                allOptions.forEach(opt => {
+                    if (parseInt(opt.textContent) === currentCorrectAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+                
+                feedback.className = 'feedback error show';
+                feedback.textContent = `✗ To'g'ri javob: ${currentCorrectAnswer}`;
+            }
+
+            setTimeout(() => {
+                allOptions.forEach(opt => opt.style.pointerEvents = 'auto');
+                currentQuestion++;
+                nextQuestion();
+            }, 2000);
+        }
+
+        function autoNextQuestion(isCorrect) {
+            if (!isCorrect) {
+                streak = 0;
+                document.getElementById('streak').style.display = 'none';
+                const feedback = document.getElementById('feedback');
+                feedback.className = 'feedback error show';
+                feedback.textContent = `⏰ Vaqt tugadi! To'g'ri javob: ${currentCorrectAnswer}`;
+                
+                const allOptions = document.querySelectorAll('.math-option');
+                allOptions.forEach(opt => {
+                    if (parseInt(opt.textContent) === currentCorrectAnswer) {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                nextQuestion();
+            }, 2000);
+        }
+
+        function endGame() {
+            clearInterval(questionTimer);
+            playVictorySound();
+            document.getElementById('gameArea').style.display = 'none';
+            document.getElementById('gameOver').classList.add('show');
+
+            const accuracy = Math.round((correctAnswers / totalQuestions) * 100);
+            
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('finalCorrect').textContent = correctAnswers;
+            document.getElementById('accuracy').textContent = accuracy;
+
+            // Determine grade
+            let grade = '';
+            if (accuracy >= 90) grade = '🏆 A+';
+            else if (accuracy >= 80) grade = '🥇 A';
+            else if (accuracy >= 70) grade = '🥈 B';
+            else if (accuracy >= 60) grade = '🥉 C';
+            else grade = '📚 D';
+            
+            document.getElementById('grade').textContent = grade;
+
+            // Check for new record
+            if (score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('mathBestScore', bestScore);
+                document.getElementById('bestScore').textContent = bestScore;
+                document.getElementById('newRecord').style.display = 'block';
+            } else {
+                document.getElementById('newRecord').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
