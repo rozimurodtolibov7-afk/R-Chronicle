@@ -2,137 +2,1283 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="NeuroFlow - Miyangizni rivojlantiring">
-    <title>🧠 NeuroFlow - Brain Training</title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/animations.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1a1a2e">
+    <title>Pixel Art Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg-dark: #0f0f1e;
+            --bg-card: #1a1a2e;
+            --accent-1: #ff6b9d;
+            --accent-2: #4dffdf;
+            --accent-3: #ffd93d;
+            --text: #ffffff;
+            --text-dim: #8b92b8;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #16213e 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(255, 107, 157, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(77, 255, 223, 0.08) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .screen {
+            position: fixed;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .screen.active {
+            display: flex;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:active {
+            transform: scale(0.98);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-1), #c44dff);
+            border: none;
+            border-radius: 15px;
+            padding: 16px;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
+            font-family: 'Poppins', sans-serif;
+            width: 100%;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 4px 10px rgba(255, 107, 157, 0.3);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        /* Welcome Screen */
+        .lang-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .lang-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+        }
+
+        .lang-btn.active {
+            border-color: var(--accent-2);
+            background: rgba(77, 255, 223, 0.1);
+            box-shadow: 0 0 20px rgba(77, 255, 223, 0.3);
+        }
+
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-row:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+        }
+
+        .toggle {
+            width: 50px;
+            height: 26px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 13px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.on {
+            background: var(--accent-2);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .toggle.on::after {
+            transform: translateX(24px);
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .menu-item:active {
+            transform: scale(0.97);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 4px 8px var(--shadow));
+        }
+
+        .menu-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .menu-desc {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        /* Canvas */
+        .canvas-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            aspect-ratio: 1;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 10px 40px var(--shadow);
+            touch-action: none;
+            image-rendering: pixelated;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .toolbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tool {
+            min-width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .tool.active {
+            background: linear-gradient(135deg, var(--accent-1), #c44dff);
+            border-color: var(--accent-1);
+            box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+        }
+
+        /* Color Display */
+        .color-display {
+            width: 100%;
+            height: 60px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            margin: 15px 0;
+            box-shadow: inset 0 2px 8px var(--shadow);
+        }
+
+        /* Palette */
+        .palette {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .palette-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .palette-item:active {
+            transform: scale(0.9);
+        }
+
+        .palette-item.selected {
+            border-color: var(--accent-3);
+            box-shadow: 0 0 20px var(--accent-3);
+        }
+
+        /* Color Mixer */
+        .mixer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .color-picker {
+            text-align: center;
+        }
+
+        .color-preview {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .color-preview:active {
+            transform: scale(0.95);
+        }
+
+        .color-input {
+            opacity: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .color-name {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+
+        .result {
+            grid-column: 1 / -1;
+            aspect-ratio: 2;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 8px var(--shadow);
+        }
+
+        /* Slider */
+        .slider-group {
+            margin: 15px 0;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .slider-value {
+            color: var(--accent-2);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        /* Back Button */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item:active {
+            transform: scale(0.95);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            image-rendering: pixelated;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            color: var(--text-dim);
+            font-size: 1rem;
+        }
+
+        /* Loading */
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-2);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .logo { font-size: 2rem; }
+            .menu-icon { font-size: 2.5rem; }
+            .palette { grid-template-columns: repeat(3, 1fr); }
+            .card { padding: 15px; }
+        }
+
+        @media (min-width: 768px) {
+            .content { max-width: 800px; }
+            .menu-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <h1 class="logo">🧠 <span data-i18n="appName">NeuroFlow</span></h1>
-                <div class="header-controls">
-                    <button class="btn-icon" id="audioToggle" title="Audio">
-                        🔊
-                    </button>
-                    <select id="langSelect" class="lang-select">
-                        <option value="uz">🇺🇿 O'zbek</option>
-                        <option value="ru">🇷🇺 Русский</option>
-                        <option value="en">🇬🇧 English</option>
-                    </select>
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="screen active" id="welcome">
+        <div class="header">
+            <div class="logo">🎨 Pixel Art</div>
+            <div class="subtitle" data-i18n="subtitle">Ijodiy asarlaringizni yarating</div>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="lang-selector">
+                    <div class="lang-btn active" onclick="app.setLang('uz')">🇺🇿</div>
+                    <div class="lang-btn" onclick="app.setLang('ru')">🇷🇺</div>
+                    <div class="lang-btn" onclick="app.setLang('en')">🇬🇧</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="toggle-row">
+                    <div class="toggle-label">
+                        <span>🎵</span>
+                        <span data-i18n="music">Musiqa</span>
+                    </div>
+                    <div class="toggle on" onclick="app.toggleMusic()" id="musicToggle"></div>
+                </div>
+                <div class="toggle-row">
+                    <div class="toggle-label">
+                        <span>🔊</span>
+                        <span data-i18n="sound">Tovush</span>
+                    </div>
+                    <div class="toggle on" onclick="app.toggleSound()" id="soundToggle"></div>
+                </div>
+            </div>
+
+            <button class="btn" onclick="app.navigate('menu')">
+                <span data-i18n="start">Boshlash</span> →
+            </button>
+        </div>
+    </div>
+
+    <!-- Menu Screen -->
+    <div class="screen" id="menu">
+        <div class="header">
+            <div class="logo">🎨 Pixel Art</div>
+            <div class="subtitle" data-i18n="menuSub">Bo'limni tanlang</div>
+        </div>
+
+        <div class="content">
+            <div class="menu-grid">
+                <div class="menu-item" onclick="app.navigate('draw')">
+                    <div class="menu-icon">🖌️</div>
+                    <div class="menu-title" data-i18n="draw">Rasm Chizish</div>
+                    <div class="menu-desc" data-i18n="drawDesc">Pixel art yarating</div>
+                </div>
+
+                <div class="menu-item" onclick="app.navigate('mixer')">
+                    <div class="menu-icon">🧪</div>
+                    <div class="menu-title" data-i18n="mixer">Rang Aralash</div>
+                    <div class="menu-desc" data-i18n="mixerDesc">Yangi ranglar</div>
+                </div>
+
+                <div class="menu-item" onclick="app.navigate('palette')">
+                    <div class="menu-icon">🎨</div>
+                    <div class="menu-title" data-i18n="palette">Palitralar</div>
+                    <div class="menu-desc" data-i18n="paletteDesc">Ranglarni boshqaring</div>
+                </div>
+
+                <div class="menu-item" onclick="app.navigate('gallery')">
+                    <div class="menu-icon">🖼️</div>
+                    <div class="menu-title" data-i18n="gallery">Galeriya</div>
+                    <div class="menu-desc" data-i18n="galleryDesc">Rasmlaringiz</div>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Container -->
-    <main class="main-container">
-        <div class="container">
-            
-            <!-- Home Screen -->
-            <div id="homeScreen" class="screen active">
-                <!-- User Stats -->
-                <div class="user-stats">
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="level">Daraja</div>
-                        <div class="stat-value" id="userLevel">1</div>
+    <!-- Draw Screen -->
+    <div class="screen" id="draw">
+        <div class="back-btn" onclick="app.navigate('menu')">←</div>
+        
+        <div class="header" style="margin-top: 50px;">
+            <div class="logo" style="font-size: 1.8rem;">🖌️ <span data-i18n="draw">Rasm Chizish</span></div>
+        </div>
+
+        <div class="content">
+            <div class="canvas-wrapper">
+                <canvas id="canvas" width="400" height="400"></canvas>
+            </div>
+
+            <div class="color-display" id="currentColor"></div>
+
+            <div class="toolbar">
+                <div class="tool active" onclick="app.setTool('brush')" id="toolBrush">🖌️</div>
+                <div class="tool" onclick="app.setTool('eraser')" id="toolEraser">🧹</div>
+                <div class="tool" onclick="app.setTool('fill')" id="toolFill">🪣</div>
+                <div class="tool" onclick="app.setTool('picker')" id="toolPicker">💧</div>
+                <div class="tool" onclick="app.clear()">🗑️</div>
+                <div class="tool" onclick="app.save()">💾</div>
+            </div>
+
+            <div class="card">
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span data-i18n="brushSize">Cho'tka hajmi</span>
+                        <span class="slider-value" id="brushValue">1</span>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="totalXP">Jami XP</div>
-                        <div class="stat-value" id="totalXP">0</div>
+                    <input type="range" min="1" max="10" value="1" oninput="app.setBrushSize(this.value)">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mixer Screen -->
+    <div class="screen" id="mixer">
+        <div class="back-btn" onclick="app.navigate('menu')">←</div>
+        
+        <div class="header" style="margin-top: 50px;">
+            <div class="logo" style="font-size: 1.8rem;">🧪 <span data-i18n="mixer">Rang Aralash</span></div>
+        </div>
+
+        <div class="content">
+            <div class="card">
+                <div class="mixer-grid">
+                    <div class="color-picker">
+                        <div class="color-preview" style="background: #ff6b9d;" onclick="document.getElementById('c1').click()" id="preview1"></div>
+                        <div class="color-name" data-i18n="color1">Rang 1</div>
+                        <input type="color" id="c1" class="color-input" value="#ff6b9d" oninput="app.updatePreview(1, this.value)">
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-label" data-i18n="streak">Ketma-ketlik</div>
-                        <div class="stat-value"><span id="streakDays">0</span> 🔥</div>
+
+                    <div class="color-picker">
+                        <div class="color-preview" style="background: #4dffdf;" onclick="document.getElementById('c2').click()" id="preview2"></div>
+                        <div class="color-name" data-i18n="color2">Rang 2</div>
+                        <input type="color" id="c2" class="color-input" value="#4dffdf" oninput="app.updatePreview(2, this.value)">
                     </div>
+
+                    <div class="result" id="mixResult" style="background: #96b5ee;"></div>
                 </div>
 
-                <!-- Daily Progress -->
-                <div class="daily-challenge">
-                    <h2 data-i18n="dailyChallenge">Kunlik Challenge</h2>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="dailyProgress"></div>
-                    </div>
-                    <p class="progress-text">
-                        <span id="dailyXP">0</span> / <span id="dailyGoal">100</span> XP
-                    </p>
-                </div>
-
-                <!-- Game Selection -->
-                <div class="games-grid">
-                    <div class="game-card" data-game="colorflow">
-                        <div class="game-icon">🎨</div>
-                        <h3 data-i18n="colorflow">ColorFlow</h3>
-                        <p data-i18n="colorflowDesc">Ranglarni eslang</p>
-                        <div class="game-reward">+15 XP</div>
-                    </div>
-
-                    <div class="game-card" data-game="reactionpulse">
-                        <div class="game-icon">⚡</div>
-                        <h3 data-i18n="reactionpulse">ReactionPulse</h3>
-                        <p data-i18n="reactionpulseDesc">Reaktsiya tezligi</p>
-                        <div class="game-reward">+20 XP</div>
-                    </div>
-
-                    <div class="game-card" data-game="patternmind">
-                        <div class="game-icon">🧩</div>
-                        <h3 data-i18n="patternmind">PatternMind</h3>
-                        <p data-i18n="patternmindDesc">Naqshni eslang</p>
-                        <div class="game-reward">+25 XP</div>
-                    </div>
-
-                    <div class="game-card" data-game="mathzen">
-                        <div class="game-icon">🔢</div>
-                        <h3 data-i18n="mathzen">MathZen</h3>
-                        <p data-i18n="mathzenDesc">Tez hisoblash</p>
-                        <div class="game-reward">+20 XP</div>
-                    </div>
-
-                    <div class="game-card" data-game="breathebalance">
-                        <div class="game-icon">🧘</div>
-                        <h3 data-i18n="breathebalance">BreatheBalance</h3>
-                        <p data-i18n="breathebalanceDesc">Nafas meditatsiyasi</p>
-                        <div class="game-reward">+10 XP</div>
-                    </div>
-                </div>
-
-                <!-- Statistics Button -->
-                <button class="btn-primary" id="showStatsBtn">
-                    <span data-i18n="viewStats">📊 Statistikani ko'rish</span>
+                <button class="btn" onclick="app.mix()">
+                    ✨ <span data-i18n="mixBtn">Aralashtur</span>
                 </button>
             </div>
 
-            <!-- Game Screens (will be dynamically populated) -->
-            <div id="gameScreen" class="screen">
-                <button class="btn-back" id="backToHome">← <span data-i18n="back">Orqaga</span></button>
-                <div id="gameContent"></div>
-            </div>
-
-            <!-- Statistics Screen -->
-            <div id="statsScreen" class="screen">
-                <button class="btn-back" id="backFromStats">← <span data-i18n="back">Orqaga</span></button>
-                <h2 data-i18n="statistics">Statistika</h2>
-                <div id="statsContent"></div>
-            </div>
-
+            <button class="btn btn-ghost" onclick="app.addToPalette()">
+                ➕ <span data-i18n="addPalette">Palitraga qo'shish</span>
+            </button>
         </div>
-    </main>
+    </div>
 
-    <!-- Notification Toast -->
-    <div id="toast" class="toast"></div>
+    <!-- Palette Screen -->
+    <div class="screen" id="palette">
+        <div class="back-btn" onclick="app.navigate('menu')">←</div>
+        
+        <div class="header" style="margin-top: 50px;">
+            <div class="logo" style="font-size: 1.8rem;">🎨 <span data-i18n="palette">Palitralar</span></div>
+        </div>
 
-    <!-- Scripts -->
-    <script src="js/i18n.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/audio.js"></script>
-    <script src="js/games/colorflow.js"></script>
-    <script src="js/games/reactionpulse.js"></script>
-    <script src="js/games/patternmind.js"></script>
-    <script src="js/games/mathzen.js"></script>
-    <script src="js/games/breathebalance.js"></script>
-    <script src="js/app.js"></script>
+        <div class="content">
+            <div class="color-display" id="paletteColor"></div>
+
+            <div class="card">
+                <div class="palette" id="paletteGrid"></div>
+            </div>
+
+            <button class="btn btn-ghost" onclick="app.resetPalette()">
+                🔄 <span data-i18n="reset">Qayta tiklash</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Gallery Screen -->
+    <div class="screen" id="gallery">
+        <div class="back-btn" onclick="app.navigate('menu')">←</div>
+        
+        <div class="header" style="margin-top: 50px;">
+            <div class="logo" style="font-size: 1.8rem;">🖼️ <span data-i18n="gallery">Galeriya</span></div>
+        </div>
+
+        <div class="content">
+            <div id="galleryContent"></div>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop preload="auto">
+        <!-- Relaxing background music -->
+    </audio>
+
+    <script>
+        const app = {
+            // State
+            lang: 'uz',
+            music: true,
+            sound: true,
+            color: '#ff6b9d',
+            brushSize: 1,
+            tool: 'brush',
+            drawing: false,
+            ctx: null,
+            gridSize: 20,
+            pixelSize: 20,
+            audioContext: null,
+            bgMusicNode: null,
+            
+            palette: [
+                '#ff6b9d', '#c44dff', '#4dffdf', '#ffd93d',
+                '#ff4757', '#5352ed', '#2ed573', '#ffa502',
+                '#1e90ff', '#ff69b4', '#00d2d3', '#ff8c00'
+            ],
+
+            // Translations
+            i18n: {
+                uz: {
+                    subtitle: 'Ijodiy asarlaringizni yarating',
+                    music: 'Musiqa', sound: 'Tovush', start: 'Boshlash',
+                    menuSub: 'Bo\'limni tanlang',
+                    draw: 'Rasm Chizish', drawDesc: 'Pixel art yarating',
+                    mixer: 'Rang Aralash', mixerDesc: 'Yangi ranglar',
+                    palette: 'Palitralar', paletteDesc: 'Ranglarni boshqaring',
+                    gallery: 'Galeriya', galleryDesc: 'Rasmlaringiz',
+                    brushSize: 'Cho\'tka hajmi',
+                    color1: 'Rang 1', color2: 'Rang 2',
+                    mixBtn: 'Aralashtur', addPalette: 'Palitraga qo\'shish',
+                    reset: 'Qayta tiklash', empty: 'Hali rasmlar yo\'q'
+                },
+                ru: {
+                    subtitle: 'Создавайте свои шедевры',
+                    music: 'Музыка', sound: 'Звук', start: 'Начать',
+                    menuSub: 'Выберите раздел',
+                    draw: 'Рисование', drawDesc: 'Создайте pixel art',
+                    mixer: 'Смешивание', mixerDesc: 'Новые цвета',
+                    palette: 'Палитры', paletteDesc: 'Управление цветами',
+                    gallery: 'Галерея', galleryDesc: 'Ваши рисунки',
+                    brushSize: 'Размер кисти',
+                    color1: 'Цвет 1', color2: 'Цвет 2',
+                    mixBtn: 'Смешать', addPalette: 'Добавить в палитру',
+                    reset: 'Сбросить', empty: 'Пока нет рисунков'
+                },
+                en: {
+                    subtitle: 'Create your masterpieces',
+                    music: 'Music', sound: 'Sound', start: 'Start',
+                    menuSub: 'Choose section',
+                    draw: 'Drawing', drawDesc: 'Create pixel art',
+                    mixer: 'Color Mix', mixerDesc: 'New colors',
+                    palette: 'Palettes', paletteDesc: 'Manage colors',
+                    gallery: 'Gallery', galleryDesc: 'Your drawings',
+                    brushSize: 'Brush size',
+                    color1: 'Color 1', color2: 'Color 2',
+                    mixBtn: 'Mix', addPalette: 'Add to palette',
+                    reset: 'Reset', empty: 'No drawings yet'
+                }
+            },
+
+            // Initialize
+            init() {
+                // Hide loading screen
+                setTimeout(() => {
+                    const loading = document.getElementById('loading');
+                    if (loading) loading.classList.add('hide');
+                }, 800);
+
+                // Setup canvas
+                const canvas = document.getElementById('canvas');
+                if (canvas) {
+                    this.ctx = canvas.getContext('2d', { willReadFrequently: true });
+                    this.pixelSize = canvas.width / this.gridSize;
+                    this.setupCanvasEvents();
+                }
+
+                // Setup background music
+                this.initAudio();
+
+                // Update translations
+                this.updateI18n();
+            },
+
+            // Initialize Audio System
+            initAudio() {
+                // Create background music using Web Audio API
+                try {
+                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create a simple ambient music loop
+                    this.createBackgroundMusic();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            },
+
+            createBackgroundMusic() {
+                if (!this.audioContext || !this.music) return;
+
+                // Stop previous music if exists
+                if (this.bgMusicNode) {
+                    try {
+                        this.bgMusicNode.stop();
+                    } catch(e) {}
+                }
+
+                // Create ambient music using oscillators
+                const now = this.audioContext.currentTime;
+                
+                // Bass note
+                const bass = this.audioContext.createOscillator();
+                const bassGain = this.audioContext.createGain();
+                bass.type = 'sine';
+                bass.frequency.setValueAtTime(110, now); // A2
+                bassGain.gain.setValueAtTime(0.03, now);
+                bass.connect(bassGain);
+                bassGain.connect(this.audioContext.destination);
+                
+                // Melody
+                const melody = this.audioContext.createOscillator();
+                const melodyGain = this.audioContext.createGain();
+                melody.type = 'sine';
+                melody.frequency.setValueAtTime(440, now); // A4
+                melodyGain.gain.setValueAtTime(0.02, now);
+                melody.connect(melodyGain);
+                melodyGain.connect(this.audioContext.destination);
+                
+                // Harmony
+                const harmony = this.audioContext.createOscillator();
+                const harmonyGain = this.audioContext.createGain();
+                harmony.type = 'sine';
+                harmony.frequency.setValueAtTime(554.37, now); // C#5
+                harmonyGain.gain.setValueAtTime(0.015, now);
+                harmony.connect(harmonyGain);
+                harmonyGain.connect(this.audioContext.destination);
+                
+                bass.start(now);
+                melody.start(now);
+                harmony.start(now);
+                
+                this.bgMusicNode = bass;
+            },
+
+            // Language
+            setLang(lang) {
+                this.lang = lang;
+                document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+                this.updateI18n();
+                this.playSound();
+            },
+
+            updateI18n() {
+                const t = this.i18n[this.lang];
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if (t[key]) el.textContent = t[key];
+                });
+            },
+
+            // Navigation
+            navigate(screen) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                const target = document.getElementById(screen);
+                if (target) {
+                    setTimeout(() => target.classList.add('active'), 50);
+                    
+                    // Initialize screens
+                    if (screen === 'draw') {
+                        setTimeout(() => this.initCanvas(), 100);
+                    }
+                    if (screen === 'palette') {
+                        this.renderPalette();
+                    }
+                    if (screen === 'gallery') {
+                        this.loadGallery();
+                    }
+                    
+                    // Start music when entering menu
+                    if (screen === 'menu' && this.music && !this.bgMusicNode) {
+                        this.createBackgroundMusic();
+                    }
+                }
+                this.playSound();
+            },
+
+            // Audio
+            toggleMusic() {
+                this.music = !this.music;
+                const toggle = document.getElementById('musicToggle');
+                if (toggle) toggle.classList.toggle('on');
+                
+                if (this.music) {
+                    this.createBackgroundMusic();
+                } else {
+                    if (this.bgMusicNode) {
+                        try {
+                            this.bgMusicNode.stop();
+                            this.bgMusicNode = null;
+                        } catch(e) {}
+                    }
+                }
+                this.playSound();
+            },
+
+            toggleSound() {
+                this.sound = !this.sound;
+                const toggle = document.getElementById('soundToggle');
+                if (toggle) toggle.classList.toggle('on');
+            },
+
+            playSound() {
+                if (!this.sound) return;
+                try {
+                    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.frequency.value = 800;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    osc.start(ctx.currentTime);
+                    osc.stop(ctx.currentTime + 0.15);
+                } catch(e) {
+                    // Silent fail if audio not supported
+                }
+            },
+
+            // Canvas
+            initCanvas() {
+                if (!this.ctx) {
+                    const canvas = document.getElementById('canvas');
+                    if (canvas) {
+                        this.ctx = canvas.getContext('2d', { willReadFrequently: true });
+                        this.pixelSize = canvas.width / this.gridSize;
+                    }
+                }
+                
+                if (!this.ctx) return;
+                
+                // Clear canvas with white background
+                this.ctx.fillStyle = '#ffffff';
+                this.ctx.fillRect(0, 0, 400, 400);
+                this.updateColorDisplay();
+            },
+
+            setupCanvasEvents() {
+                const canvas = document.getElementById('canvas');
+                if (!canvas) return;
+
+                const getPos = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                    return {
+                        x: Math.floor((clientX - rect.left) / (rect.width / this.gridSize)),
+                        y: Math.floor((clientY - rect.top) / (rect.height / this.gridSize))
+                    };
+                };
+
+                const start = (e) => {
+                    this.drawing = true;
+                    this.draw(e);
+                };
+
+                const move = (e) => {
+                    if (!this.drawing && this.tool !== 'picker') return;
+                    this.draw(e);
+                };
+
+                const stop = () => {
+                    this.drawing = false;
+                };
+
+                canvas.addEventListener('mousedown', start);
+                canvas.addEventListener('mousemove', move);
+                canvas.addEventListener('mouseup', stop);
+                canvas.addEventListener('mouseleave', stop);
+                canvas.addEventListener('touchstart', (e) => { e.preventDefault(); start(e); });
+                canvas.addEventListener('touchmove', (e) => { e.preventDefault(); move(e); });
+                canvas.addEventListener('touchend', stop);
+            },
+
+            draw(e) {
+                const canvas = document.getElementById('canvas');
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const x = Math.floor((clientX - rect.left) / (rect.width / this.gridSize));
+                const y = Math.floor((clientY - rect.top) / (rect.height / this.gridSize));
+
+                if (this.tool === 'brush') {
+                    this.drawPixel(x, y, this.color);
+                } else if (this.tool === 'eraser') {
+                    this.drawPixel(x, y, '#ffffff');
+                } else if (this.tool === 'fill' && this.drawing) {
+                    this.floodFill(x, y);
+                    this.drawing = false;
+                } else if (this.tool === 'picker') {
+                    this.pickColor(x, y);
+                }
+            },
+
+            drawPixel(x, y, color) {
+                const half = Math.floor(this.brushSize / 2);
+                for (let i = -half; i <= half; i++) {
+                    for (let j = -half; j <= half; j++) {
+                        const px = x + i, py = y + j;
+                        if (px >= 0 && px < this.gridSize && py >= 0 && py < this.gridSize) {
+                            this.ctx.fillStyle = color;
+                            this.ctx.fillRect(px * this.pixelSize, py * this.pixelSize, this.pixelSize, this.pixelSize);
+                        }
+                    }
+                }
+            },
+
+            floodFill(x, y) {
+                const imageData = this.ctx.getImageData(0, 0, 400, 400);
+                const target = this.getColor(imageData, x * this.pixelSize, y * this.pixelSize);
+                const fill = this.hexToRgb(this.color);
+                
+                if (this.colorMatch(target, fill)) return;
+                
+                const stack = [[x * this.pixelSize, y * this.pixelSize]];
+                
+                while (stack.length) {
+                    const [px, py] = stack.pop();
+                    if (px < 0 || px >= 400 || py < 0 || py >= 400) continue;
+                    
+                    const current = this.getColor(imageData, px, py);
+                    if (!this.colorMatch(current, target)) continue;
+                    
+                    this.setColor(imageData, px, py, fill);
+                    stack.push([px + 1, py], [px - 1, py], [px, py + 1], [px, py - 1]);
+                }
+                
+                this.ctx.putImageData(imageData, 0, 0);
+            },
+
+            pickColor(x, y) {
+                const data = this.ctx.getImageData(x * this.pixelSize + 1, y * this.pixelSize + 1, 1, 1).data;
+                this.color = '#' + [data[0], data[1], data[2]].map(x => x.toString(16).padStart(2, '0')).join('');
+                this.updateColorDisplay();
+            },
+
+            getColor(data, x, y) {
+                const i = (Math.floor(y) * 400 + Math.floor(x)) * 4;
+                return { r: data.data[i], g: data.data[i+1], b: data.data[i+2] };
+            },
+
+            setColor(data, x, y, c) {
+                const i = (Math.floor(y) * 400 + Math.floor(x)) * 4;
+                data.data[i] = c.r;
+                data.data[i+1] = c.g;
+                data.data[i+2] = c.b;
+                data.data[i+3] = 255;
+            },
+
+            colorMatch(c1, c2) {
+                return c1.r === c2.r && c1.g === c2.g && c1.b === c2.b;
+            },
+
+            hexToRgb(hex) {
+                return {
+                    r: parseInt(hex.substr(1, 2), 16),
+                    g: parseInt(hex.substr(3, 2), 16),
+                    b: parseInt(hex.substr(5, 2), 16)
+                };
+            },
+
+            // Tools
+            setTool(tool) {
+                this.tool = tool;
+                document.querySelectorAll('.tool').forEach(t => t.classList.remove('active'));
+                const el = document.getElementById('tool' + tool.charAt(0).toUpperCase() + tool.slice(1));
+                if (el) el.classList.add('active');
+                this.playSound();
+            },
+
+            setBrushSize(value) {
+                this.brushSize = parseInt(value);
+                const el = document.getElementById('brushValue');
+                if (el) el.textContent = value;
+            },
+
+            updateColorDisplay() {
+                ['currentColor', 'paletteColor'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.background = this.color;
+                });
+            },
+
+            clear() {
+                const messages = {
+                    uz: 'Rasmni tozalamoqchimisiz?',
+                    ru: 'Очистить рисунок?',
+                    en: 'Clear drawing?'
+                };
+                if (confirm(messages[this.lang] || 'Clear?')) {
+                    this.initCanvas();
+                    this.playSound();
+                }
+            },
+
+            save() {
+                const canvas = document.getElementById('canvas');
+                if (!canvas) return;
+                
+                try {
+                    const data = canvas.toDataURL('image/png');
+                    const saved = JSON.parse(localStorage.getItem('pixelart') || '[]');
+                    saved.push({ data, date: Date.now() });
+                    localStorage.setItem('pixelart', JSON.stringify(saved));
+                    
+                    const messages = {
+                        uz: '✓ Saqlandi!',
+                        ru: '✓ Сохранено!',
+                        en: '✓ Saved!'
+                    };
+                    alert(messages[this.lang] || '✓ Saved!');
+                    this.playSound();
+                } catch(e) {
+                    const errors = {
+                        uz: '✗ Xatolik!',
+                        ru: '✗ Ошибка!',
+                        en: '✗ Error!'
+                    };
+                    alert(errors[this.lang] || '✗ Error!');
+                }
+            },
+
+            // Mixer
+            updatePreview(num, color) {
+                const el = document.getElementById('preview' + num);
+                if (el) el.style.background = color;
+            },
+
+            mix() {
+                const c1 = document.getElementById('c1').value;
+                const c2 = document.getElementById('c2').value;
+                
+                const rgb1 = this.hexToRgb(c1);
+                const rgb2 = this.hexToRgb(c2);
+                
+                const mixed = '#' + [
+                    Math.round((rgb1.r + rgb2.r) / 2),
+                    Math.round((rgb1.g + rgb2.g) / 2),
+                    Math.round((rgb1.b + rgb2.b) / 2)
+                ].map(x => x.toString(16).padStart(2, '0')).join('');
+                
+                const el = document.getElementById('mixResult');
+                if (el) el.style.background = mixed;
+                this.color = mixed;
+                this.updateColorDisplay();
+                this.playSound();
+            },
+
+            addToPalette() {
+                const el = document.getElementById('mixResult');
+                if (!el) return;
+                
+                const color = this.rgbToHex(el.style.background);
+                if (!this.palette.includes(color)) {
+                    if (this.palette.length >= 12) this.palette.shift();
+                    this.palette.push(color);
+                    
+                    const messages = {
+                        uz: '✓ Palitraga qo\'shildi!',
+                        ru: '✓ Добавлено в палитру!',
+                        en: '✓ Added to palette!'
+                    };
+                    alert(messages[this.lang] || '✓ Added!');
+                    this.playSound();
+                }
+            },
+
+            rgbToHex(rgb) {
+                const m = rgb.match(/\d+/g);
+                if (!m) return rgb;
+                return '#' + m.slice(0, 3).map(x => parseInt(x).toString(16).padStart(2, '0')).join('');
+            },
+
+            // Palette
+            renderPalette() {
+                const grid = document.getElementById('paletteGrid');
+                if (!grid) return;
+                
+                grid.innerHTML = '';
+                this.palette.forEach(color => {
+                    const div = document.createElement('div');
+                    div.className = 'palette-item';
+                    div.style.background = color;
+                    if (color === this.color) div.classList.add('selected');
+                    div.onclick = () => {
+                        this.color = color;
+                        this.updateColorDisplay();
+                        this.renderPalette();
+                        this.playSound();
+                    };
+                    grid.appendChild(div);
+                });
+            },
+
+            resetPalette() {
+                const messages = {
+                    uz: 'Palitralarni qayta tiklamoqchimisiz?',
+                    ru: 'Сбросить палитру?',
+                    en: 'Reset palette?'
+                };
+                if (confirm(messages[this.lang] || 'Reset palette?')) {
+                    this.palette = [
+                        '#ff6b9d', '#c44dff', '#4dffdf', '#ffd93d',
+                        '#ff4757', '#5352ed', '#2ed573', '#ffa502',
+                        '#1e90ff', '#ff69b4', '#00d2d3', '#ff8c00'
+                    ];
+                    this.renderPalette();
+                    this.playSound();
+                }
+            },
+
+            // Gallery
+            loadGallery() {
+                const saved = JSON.parse(localStorage.getItem('pixelart') || '[]');
+                const content = document.getElementById('galleryContent');
+                if (!content) return;
+
+                if (!saved.length) {
+                    content.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📭</div>
+                            <div class="empty-text">${this.i18n[this.lang].empty}</div>
+                        </div>
+                    `;
+                } else {
+                    content.innerHTML = '<div class="gallery-grid"></div>';
+                    const grid = content.querySelector('.gallery-grid');
+                    saved.reverse().forEach((item, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'gallery-item';
+                        div.innerHTML = `<img src="${item.data}" alt="Art ${i+1}">`;
+                        div.onclick = () => {
+                            const a = document.createElement('a');
+                            a.download = `pixel-art-${i+1}.png`;
+                            a.href = item.data;
+                            a.click();
+                        };
+                        grid.appendChild(div);
+                    });
+                }
+            }
+        };
+
+        // Start
+        window.addEventListener('DOMContentLoaded', () => app.init());
+    </script>
 </body>
 </html>
